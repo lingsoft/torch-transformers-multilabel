@@ -18,29 +18,32 @@ To predict labels for a text file (several texts when separated by linebreak):
 
 List of registers and their abbreviations (used as labels):
 
-| Register                           | Label         |
+| General Register                   | Label        |
 |------------------------------------|--------------|
-| How-to                             | HI           |
-| Interactive Discussion             | ID           |
-| Informative                      | IN           |
-| Informational Persuasion           | IP           |
+| How-to/Instructions                | HI           |
+| Interactive discussion             | ID           |
+| Informational description          | IN           |
+| Informational persuasion           | IP           |
 | Lyrical                            | LY           |
 | Narrative                          | NA           |
 | Opinion                            | OP           |
 | Spoken                             | SP           |
-| Advice                             | av           |
-| Description with intent to sell    | ds           |
-| Description of a thing or a person | dtp          |
-| News & opinion blog or editorial   | ed           |
-| Encyclopedia article               | en           |
-| FAQ                                | fi           |
-| Interview                          | it           |
-| Legal terms and conditions         | lt           |
-| Narrative blog                     | nb           |
-| News report                        | ne           |
-| Opinion blo                        | ob           |
-| Research article                   | ra           |
-| Recipe                             | re           |
-| Denominational religious blog / sermon | rs           |
-| Review                             | rv           |
-| Sports report                      | sr           |
+
+| Sub-register                       | Label        | General |
+|------------------------------------|--------------|---------|
+| Advice                             | av           | OP      |
+| Description with intent to sell    | ds           | IP      |
+| Description of a thing or a person | dtp          | IN      |
+| News & opinion blog or editorial   | ed           | NA      |
+| Encyclopedia article               | en           | IN      |
+| FAQ                                | fi           | IN      |
+| Interview                          | it           | SP      |
+| Legal terms and conditions         | lt           | IN      |
+| Narrative blog                     | nb           | NA      |
+| News report                        | ne           | NA      |
+| Opinion blog                       | ob           | OP      |
+| Research article                   | ra           | IN      |
+| Recipe                             | re           | HI      |
+| Religious blog / sermon            | rs           | OP      |
+| Review                             | rv           | OP      |
+| Sports report                      | sr           | NA      |
