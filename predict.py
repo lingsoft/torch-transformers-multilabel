@@ -1,8 +1,8 @@
+import sys
+from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
+
 import transformers
 import torch
-import sys
-import numpy as np
-from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
 
 
 torch.set_num_threads(2)
@@ -30,23 +30,30 @@ def argparser():
     return ap
 
 
-def predict_labels(tokenizer, model, labels, threshold, text):
-    tokenized = tokenizer(text, return_tensors='pt')
-    pred = model(**tokenized)
-    sigmoid = torch.nn.Sigmoid()
-    probs = sigmoid(torch.Tensor(pred.logits.detach().numpy()))
-    preds = np.zeros(probs.shape)
-    preds[np.where(probs >= threshold)] = 1
-    return [labels_full[idx] for idx, prob in enumerate(preds.flatten())
-            if prob >= threshold and labels_full[idx] in labels]
-
-
 def load_models(name_tokenizer, name_fine_tuned):
     tokenizer = transformers.AutoTokenizer.from_pretrained(
             name_tokenizer)
     model = torch.load(
             name_fine_tuned, map_location=torch.device('cpu'))
     return tokenizer, model
+
+
+def predict(tokenizer, model, text):
+    tokenized = tokenizer(text, return_tensors='pt')
+    pred = model(**tokenized)
+    sigmoid = torch.nn.Sigmoid()
+    probs = sigmoid(torch.Tensor(pred.logits.detach().numpy()))
+    return [(idx, prob) for idx, prob in enumerate(
+        probs.detach().cpu().numpy()[0])]
+
+
+def print_labels(probs, labels, threshold):
+    probs.sort(key=lambda x: x[1], reverse=True)
+    for idx, prob in probs:
+        label = labels_full[idx]
+        if prob > threshold and label in labels:
+            print((label, prob), end=" ")
+    print()
 
 
 def main():
@@ -60,9 +67,8 @@ def main():
 
     with open(options.text, 'r') as infile:
         for line in infile:
-            predictions = predict_labels(
-                    tokenizer, model, labels, options.threshold, line)
-            print(f'{" ".join(predictions)}')
+            probs = predict(tokenizer, model, line)
+            print_labels(probs, labels, options.threshold)
     return 0
 
 
