@@ -23,7 +23,8 @@ def argparser():
                     help='Load model from file')
     ap.add_argument('--threshold', default=0.4, metavar='FLOAT', type=float,
                     help='threshold for calculating f-score')
-    ap.add_argument('--labels', choices=['full', 'upper'], default='full')
+    ap.add_argument('--labels', choices=['full', 'upper', 'lower'],
+                    default='full')
     ap.add_argument('--output', default=None, metavar='FILE',
                     help='Location to save predictions')
     return ap
@@ -36,8 +37,8 @@ def predict_labels(tokenizer, model, labels, threshold, text):
     probs = sigmoid(torch.Tensor(pred.logits.detach().numpy()))
     preds = np.zeros(probs.shape)
     preds[np.where(probs >= threshold)] = 1
-    return [labels[idx] for idx, label in enumerate(preds.flatten())
-            if label >= threshold]
+    return [labels_full[idx] for idx, prob in enumerate(preds.flatten())
+            if prob >= threshold and labels_full[idx] in labels]
 
 
 def load_models(name_tokenizer, name_fine_tuned):
@@ -51,10 +52,11 @@ def load_models(name_tokenizer, name_fine_tuned):
 def main():
     options = argparser().parse_args(sys.argv[1:])
     tokenizer, model = load_models(options.model_name, options.load_model)
-    if options.labels == 'full':
-        labels = labels_full
-    else:
+    labels = labels_full
+    if options.labels == "upper":
         labels = labels_upper
+    if options.labels == "lower":
+        labels = labels_lower
 
     with open(options.text, 'r') as infile:
         for line in infile:
