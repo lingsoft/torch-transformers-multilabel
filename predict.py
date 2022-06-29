@@ -7,10 +7,10 @@ import torch
 
 torch.set_num_threads(2)
 MODEL_NAME = 'xlm-roberta-base'
-labels_upper = ['HI', 'ID', 'IN', 'IP', 'LY', 'NA', 'OP', 'SP']
-labels_lower = ['av', 'ds', 'dtp', 'ed', 'en', 'fi', 'it', 'lt',
-                'nb', 'ne', 'ob', 'ra', 're', 'rs', 'rv', 'sr']
-labels_full = labels_upper + labels_lower
+labels_general = ['HI', 'ID', 'IN', 'IP', 'LY', 'NA', 'OP', 'SP']
+labels_sub = ['av', 'ds', 'dtp', 'ed', 'en', 'fi', 'it', 'lt',
+              'nb', 'ne', 'ob', 'ra', 're', 'rs', 'rv', 'sr']
+labels_full = labels_general + labels_sub
 
 
 def argparser():
@@ -23,7 +23,7 @@ def argparser():
                     help='Load model from file')
     ap.add_argument('--threshold', default=0.4, metavar='FLOAT', type=float,
                     help='threshold for calculating f-score')
-    ap.add_argument('--labels', choices=['full', 'upper', 'lower'],
+    ap.add_argument('--labels', choices=['full', 'general'],
                     default='full')
     ap.add_argument('--output', default=None, metavar='FILE',
                     help='Location to save predictions')
@@ -60,10 +60,8 @@ def main():
     options = argparser().parse_args(sys.argv[1:])
     tokenizer, model = load_models(options.model_name, options.load_model)
     labels = labels_full
-    if options.labels == "upper":
-        labels = labels_upper
-    if options.labels == "lower":
-        labels = labels_lower
+    if options.labels == "general":
+        labels = labels_general
 
     with open(options.text, 'r') as infile:
         for line in infile:
