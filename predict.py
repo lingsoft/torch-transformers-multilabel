@@ -43,14 +43,13 @@ def predict(tokenizer, model, text):
     pred = model(**tokenized)
     sigmoid = torch.nn.Sigmoid()
     probs = sigmoid(torch.Tensor(pred.logits.detach().numpy()))
-    return [(idx, prob) for idx, prob in enumerate(
+    return [(labels_full[idx], prob) for idx, prob in enumerate(
         probs.detach().cpu().numpy()[0])]
 
 
 def print_labels(probs, labels, threshold):
     probs.sort(key=lambda x: x[1], reverse=True)
-    for idx, prob in probs:
-        label = labels_full[idx]
+    for label, prob in probs:
         if prob > threshold and label in labels:
             print((label, prob), end=" ")
     print()
