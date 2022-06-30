@@ -31,18 +31,24 @@ def argparser():
 
 
 def load_models(name_tokenizer, name_fine_tuned):
-    tokenizer = transformers.AutoTokenizer.from_pretrained(
-            name_tokenizer)
-    model = torch.load(
-            name_fine_tuned, map_location=torch.device('cpu'))
+    try:
+        tokenizer = transformers.AutoTokenizer.from_pretrained(
+                name_tokenizer)
+        model = torch.load(
+                name_fine_tuned, map_location=torch.device('cpu'))
+    except Exception:
+        raise
     return tokenizer, model
 
 
 def predict(tokenizer, model, text):
-    tokenized = tokenizer(text, return_tensors='pt')
-    pred = model(**tokenized)
-    sigmoid = torch.nn.Sigmoid()
-    probs = sigmoid(torch.Tensor(pred.logits.detach().numpy()))
+    try:
+        tokenized = tokenizer(text, return_tensors='pt')
+        pred = model(**tokenized)
+        sigmoid = torch.nn.Sigmoid()
+        probs = sigmoid(torch.Tensor(pred.logits.detach().numpy()))
+    except Exception:
+        raise
     return [(labels_full[idx], prob) for idx, prob in enumerate(
         probs.detach().cpu().numpy()[0])]
 
